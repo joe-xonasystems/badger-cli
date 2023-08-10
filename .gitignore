@@ -4,7 +4,7 @@
 *.dll
 *.so
 *.dylib
-badger-cli
+./badger-cli
 
 # Test binary, built with `go test -c`
 *.test
