@@ -22,6 +22,6 @@ func Execute() {
 }
 
 func init() {
-	rootCmd.PersistentFlags().StringP("dir", "d", "", "Path to the badger database direcotry")
+	rootCmd.PersistentFlags().StringP("dir", "d", "", "Path to the badger database directory")
 	rootCmd.MarkFlagRequired("dir")
 }

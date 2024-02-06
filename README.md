@@ -17,7 +17,7 @@ Available Commands:
   set         Set a key and its value
 
 Flags:
-  -d, --dir string   Path to the badger database direcotry
+  -d, --dir string   Path to the badger database directory
   -h, --help         help for badger-cli
 
 Use "badger-cli [command] --help" for more information about a command.
