@@ -34,7 +34,7 @@ func getCmd() *cobra.Command {
 			fmt.Println(value)
 		},
 	}
-	cmd.PersistentFlags().StringVar(&format, "fmt", "string", "Storage format of value ('string' or 'int64AsBytes'")
+	cmd.PersistentFlags().StringVar(&format, "fmt", "string", "Storage format of value ('string', 'json', or 'int64AsBytes'")
 
 	return cmd
 }
