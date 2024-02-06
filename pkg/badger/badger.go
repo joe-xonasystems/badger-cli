@@ -1,6 +1,8 @@
 package badger
 
 import (
+	"encoding/binary"
+	"encoding/json"
 	"fmt"
 	"time"
 
@@ -33,28 +35,54 @@ func Open(dir string) (*DB, error) {
 	return &DB{DB: db}, err
 }
 
-func (db *DB) Get(keys ...string) ([]string, error) {
-	var values []string
-	err := db.View(func(txn *badger.Txn) error {
-		for _, k := range keys {
-			item, err := txn.Get([]byte(k))
-			if err != nil {
-				if err == badger.ErrKeyNotFound {
-					return fmt.Errorf("Key %s not found", k)
-				}
-				return err
-			}
+func jsonString(valueBytes []byte, valueJson any) (string, error) {
+	if err := json.Unmarshal(valueBytes, &valueJson); err != nil {
+		return "", err
+	}
+	indentJsonBytes, err := json.MarshalIndent(valueJson, "", "  ")
+	if err != nil {
+		return "", err
+	}
+	return string(indentJsonBytes), nil
+}
 
-			value, err := item.ValueCopy(nil)
-			if err != nil {
-				return err
+func (db *DB) Get(key string, storageFormat string) (string, error) {
+	valueBytes := make([]byte, 0)
+	err := db.View(func(txn *badger.Txn) error {
+		item, err := txn.Get([]byte(key))
+		if err != nil {
+			if err == badger.ErrKeyNotFound {
+				return fmt.Errorf("Key %s not found", key)
 			}
-			values = append(values, string(value))
+			return err
+		}
+
+		valueBytes, err = item.ValueCopy(nil)
+		if err != nil {
+			return err
 		}
 
 		return nil
 	})
-	return values, err
+
+	if err != nil {
+		return "", err
+	}
+
+	var value string
+
+	switch storageFormat {
+	case "json":
+		var valueJson []map[string]interface{}
+		value, err = jsonString(valueBytes, valueJson)
+	case "string":
+		value = string(valueBytes)
+	case "int64AsBytes":
+		valueInt := int(binary.BigEndian.Uint64(valueBytes))
+		value = fmt.Sprintf("%d", valueInt)
+	}
+
+	return value, err
 }
 
 func (db *DB) List(prefix string, limit, offset int) ([]ListResult, int, error) {

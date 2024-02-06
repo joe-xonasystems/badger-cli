@@ -2,34 +2,43 @@ package cmd
 
 import (
 	"fmt"
-	"log"
-
 	"github.com/joe-xonasystems/badger-cli/pkg/badger"
 	"github.com/spf13/cobra"
+	"log"
 )
 
-var getCmd = &cobra.Command{
-	Use:   "get [key]...",
-	Short: "Get content of a specific key",
-	Args:  cobra.MinimumNArgs(1),
-	Run: func(cmd *cobra.Command, args []string) {
-		db, err := badger.Open(cmd.Flag("dir").Value.String())
-		if err != nil {
-			log.Fatalln(err)
-		}
-		defer db.Close()
+func getCmd() *cobra.Command {
+	var format string
+	cmd := &cobra.Command{
+		Use:   "get [key]",
+		Short: "Get content of a specific key",
+		Args:  cobra.ExactArgs(1),
+		Run: func(cmd *cobra.Command, args []string) {
+			storageFormat, err := cmd.Flags().GetString("fmt")
+			if err != nil {
+				log.Fatalln(err)
+				return
+			}
 
-		values, err := db.Get(args...)
-		if err != nil {
-			log.Fatalln(err)
-		}
+			db, err := badger.Open(cmd.Flag("dir").Value.String())
+			if err != nil {
+				log.Fatalln(err)
+			}
+			defer db.Close()
 
-		for _, v := range values {
-			fmt.Println(v)
-		}
-	},
+			value, err := db.Get(args[0], storageFormat)
+			if err != nil {
+				log.Fatalln(err)
+			}
+
+			fmt.Println(value)
+		},
+	}
+	cmd.PersistentFlags().StringVar(&format, "fmt", "string", "Storage format of value ('string' or 'int64AsBytes'")
+
+	return cmd
 }
 
 func init() {
-	rootCmd.AddCommand(getCmd)
+	rootCmd.AddCommand(getCmd())
 }
