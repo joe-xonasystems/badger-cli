@@ -3,7 +3,7 @@ package cmd
 import (
 	"log"
 
-	"github.com/joe-xonasystems/badger-cli/pkg/badger"
+	"github.com/xonasystems/badger-cli/pkg/badger"
 	"github.com/spf13/cobra"
 )
 
