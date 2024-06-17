@@ -1,4 +1,4 @@
-module github.com/joe-xonasystems/badger-cli
+module github.com/xonasystems/badger-cli
 
 go 1.20
 
