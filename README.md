@@ -1,6 +1,6 @@
 # badger-cli
 
-`go install github.com/joe-xonasystems/badger-cli`
+`go install github.com/xonasystems/badger-cli`
 
 
 ```
